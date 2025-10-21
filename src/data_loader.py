@@ -31,6 +31,8 @@ def generating_pairs(path):
         different_label = 0
         all_samples.append((different_sample_data, different_label))
 
+        all_samples = np.array(all_samples)
+
     return all_samples
 
 

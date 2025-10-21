@@ -5,44 +5,39 @@ import os
 import pprint
 import random
 
+path_data = "..\\data\\classification\\train1000\\*\\*.*"
 
-data_folders = os.listdir('..\\data\\classification\\train1000')
+def generating_pairs(path):
 
-# address_dict = {}
+    all_address = [address for address in glob.glob(path)]
+    image_categories = np.array([category.split("\\")[-2] for category in glob.glob(path)])
+    all_samples = []
 
-# for address in glob.glob("..\\data\\classification\\train1000\\*\\*.*"):
+    for image_address in all_address:
 
-#     label = address.split("\\")[-2]
-#     if label in address_dict:
-#         address_dict[label].append(address)
+        image_category = image_address.split("\\")[-2]
+        current_img = cv2.imread(image_address)
+        same_imgs_indexs = np.where(image_categories == image_category)[0]
+        same_img_index = random.choice(same_imgs_indexs)
+        same_img = cv2.imread(all_address[same_img_index])
+        same_sample_data = np.concatenate((current_img, same_img), axis=1)
+        same_label = 1
+        all_samples.append((same_sample_data, same_label))
 
-#     else:
-#         address_dict[label] = [address]
+        different_imgs_indexs = np.where(image_categories != image_category)[0]
+        different_img_index = random.choice(different_imgs_indexs)
+        different_img = cv2.imread(all_address[different_img_index])
+        different_sample_data = np.concatenate((current_img, different_img), axis=1)
+        different_label = 0
+        all_samples.append((different_sample_data, different_label))
 
-all_address = [address for address in glob.glob("..\\data\\classification\\train1000\\*\\*.*")]
-image_categories = [category.split("\\")[-2] for category in glob.glob("..\\data\\classification\\train1000\\*\\*.*")]
+    return all_samples
 
-all_samples = []
 
-for image_address in all_address:
 
-    image_category = image_address.split("\\")[-2]
-    current_img = cv2.imread(image_address)
-    same_imgs_indexs = np.where(image_categories == image_category)
-    print(same_imgs_indexs)
-    print("\n")
-    same_img_address = random.choice(same_imgs_indexs)
-    print(same_img_address)
-    print("\n")
-    same_img = cv2.imread(all_address[same_img_address])
-    sample_data = np.concatenate((current_img, same_img), axis=1)
-    label = 1
 
-    all_samples.append((sample_data, label))
-    cv2.imshow('image', current_img)
-    cv2.waitKey(0)
-    break
-print(all_samples)
+
+
 
 
 

@@ -2,7 +2,7 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dropout, GlobalAverage
 from tensorflow.keras.models import Model
 
 
-def embeding_extractor(inputShape=(224, 224, 3), embeddingDim=48):
+def embedding_extractor(inputShape=(224, 224, 3), embeddingDim=48):
 
     input_layer = Input(inputShape, name = "input_layer")
 
@@ -29,4 +29,3 @@ def embeding_extractor(inputShape=(224, 224, 3), embeddingDim=48):
 
     return model
 
-model = embeding_extractor()

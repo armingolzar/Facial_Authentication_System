@@ -12,7 +12,7 @@ def generating_pairs(path):
     all_address = [address for address in glob.glob(path)]
     image_categories = np.array([category.split("\\")[-2] for category in glob.glob(path)])
     all_samples = []
-
+    all_labels = []
     for image_address in all_address:
 
         image_category = image_address.split("\\")[-2]
@@ -22,21 +22,21 @@ def generating_pairs(path):
         same_img = cv2.imread(all_address[same_img_index])
         same_sample_data = np.concatenate((current_img, same_img), axis=1)
         same_label = 1
-        all_samples.append((same_sample_data, same_label))
+        all_samples.append(same_sample_data)
+        all_labels.append(same_label)
 
         different_imgs_indexs = np.where(image_categories != image_category)[0]
         different_img_index = random.choice(different_imgs_indexs)
         different_img = cv2.imread(all_address[different_img_index])
         different_sample_data = np.concatenate((current_img, different_img), axis=1)
         different_label = 0
-        all_samples.append((different_sample_data, different_label))
+        all_samples.append(different_sample_data)
+        all_labels.append(different_label)
 
-        all_samples = np.array(all_samples)
+    all_samples = np.array(all_samples)
+    all_labels = np.array(all_labels)
 
-    return all_samples
-
-
-
+    return all_samples, all_labels
 
 
 

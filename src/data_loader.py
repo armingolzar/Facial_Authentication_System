@@ -58,37 +58,39 @@ def get_image_path_and_categories(path):
 
 def full_epoch_data_generator(addrs, cats, batch_size):
 
-    indices = np.arange(len(addrs))
-    np.random.shuffle(indices)
-    samples_batch_nedded = batch_size // 2
+    while True: 
+        
+        indices = np.arange(len(addrs))
+        np.random.shuffle(indices)
+        samples_batch_nedded = batch_size // 2
 
-    for index in range(0, len(indices), samples_batch_nedded):
-        batch_indices = indices[index : index + samples_batch_nedded]
-        batch_samples, batch_pairs, batch_labels = [], [], []
-
-
-        for sample_idx in batch_indices:
-            sample_path = addrs[sample_idx]
-            sample_label = cats[sample_idx]
-
-            # positive pair
-            pos_candidates = [i for i, itrator in enumerate(cats) if itrator == sample_label and i != sample_idx]
-            pos_idx = random.choice(pos_candidates) if pos_candidates else sample_idx
-            pos_path = addrs[pos_idx]
+        for index in range(0, len(indices), samples_batch_nedded):
+            batch_indices = indices[index : index + samples_batch_nedded]
+            batch_samples, batch_pairs, batch_labels = [], [], []
 
 
-            # negative pair
-            neg_candidates = [i2 for i2, itrator2 in enumerate(cats) if itrator2 != sample_label]
-            neg_idx = random.choice(neg_candidates)
-            neg_path = addrs[neg_idx]
+            for sample_idx in batch_indices:
+                sample_path = addrs[sample_idx]
+                sample_label = cats[sample_idx]
+
+                # positive pair
+                pos_candidates = [i for i, itrator in enumerate(cats) if itrator == sample_label and i != sample_idx]
+                pos_idx = random.choice(pos_candidates) if pos_candidates else sample_idx
+                pos_path = addrs[pos_idx]
 
 
-            # appending pairs
-            batch_samples.extend([sample_path, sample_path])
-            batch_pairs.extend([pos_path, neg_path])
-            batch_labels.extend([1.0, 0.0])
+                # negative pair
+                neg_candidates = [i2 for i2, itrator2 in enumerate(cats) if itrator2 != sample_label]
+                neg_idx = random.choice(neg_candidates)
+                neg_path = addrs[neg_idx]
 
-        yield (batch_samples, batch_pairs), batch_labels
+
+                # appending pairs
+                batch_samples.extend([sample_path, sample_path])
+                batch_pairs.extend([pos_path, neg_path])
+                batch_labels.extend([1.0, 0.0])
+
+            yield (batch_samples, batch_pairs), batch_labels
 
 def preprocess_image(image_path):
     img = tf.io.read_file(image_path)
@@ -103,9 +105,9 @@ def create_dataset(addrs, cats, batch_size):
 
     dataset = tf.data.Dataset.from_generator(
                 lambda: full_epoch_data_generator(addrs, cats, batch_size),
-                output_signature=((tf.TensorSpec(shape=(batch_size,), dtype=tf.string),
-                                   tf.TensorSpec(shape=(batch_size,), dtype=tf.string)),
-                                   tf.TensorSpec(shape=(batch_size,), dtype=tf.float32))
+                output_signature=((tf.TensorSpec(shape=(None,), dtype=tf.string),
+                                   tf.TensorSpec(shape=(None,), dtype=tf.string)),
+                                   tf.TensorSpec(shape=(None,), dtype=tf.float32))
     )
 
 

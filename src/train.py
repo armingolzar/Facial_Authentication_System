@@ -9,6 +9,8 @@ from tensorflow.keras.models import Model
 train_addrs, train_cats = get_image_path_and_categories(config.DATA_TRAIN_PATH)
 test_addrs, test_cats = get_image_path_and_categories(config.DATA_TEST_PATH)
 
+steps_per_epoch = len(train_addrs) * 2 // config.BATCH_SIZE 
+
 train_dataset = create_dataset(train_addrs, train_cats, config.BATCH_SIZE)
 test_dataset = create_dataset(test_addrs, test_cats, config.BATCH_SIZE)
 
@@ -32,7 +34,8 @@ siamese_face_model.compile(
 
 print("[INFO] Training the siamese_face_model...")
 history = siamese_face_model.fit(train_dataset, validation_data=test_dataset,
-                                  batch_size=config.BATCH_SIZE, epochs=config.EPOCHS)
+                                  epochs=config.EPOCHS, steps_per_epoch=steps_per_epoch, 
+                                  validation_steps=(len(test_addrs)*2)//config.BATCH_SIZE)
 
 print("[INFO] Saving siamese_face_model...")
 siamese_face_model.save(config.MODELS_PATH)

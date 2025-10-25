@@ -1,28 +1,44 @@
-from data_loader import generating_pairs
+from data_loader import get_image_path_and_categories, full_epoch_data_generator, preprocess_image, create_dataset
 from model import embedding_extractor
-from utils import euclidean_distance, learning_curves
+from utils import euclidean_distance, ploting_learning_curves
 import config
 from tensorflow.keras.layers import Dense, Input, Lambda
 from tensorflow.keras.models import Model
 
 
+train_addrs, train_cats = get_image_path_and_categories(config.DATA_TRAIN_PATH)
+test_addrs, test_cats = get_image_path_and_categories(config.DATA_TEST_PATH)
 
-train_samples, train_labels = generating_pairs(config.DATA_TRAIN_PATH)
-test_samples, test_labels = generating_pairs(config.DATA_TEST_PATH)
-print(train_samples[0])
-print(train_labels[0])
-    
-# inputA = Input(config.IMAGE_SHAPE, name="inputA")
-# inputB = Input(config.IMAGE_SHAPE, name="inputB")
+train_dataset = create_dataset(train_addrs, train_cats, config.BATCH_SIZE)
+test_dataset = create_dataset(test_addrs, test_cats, config.BATCH_SIZE)
 
-# embedding_extractor_model = embedding_extractor(config.IMAGE_SHAPE)
-# embeddedA = embedding_extractor_model(inputA)
-# embeddedB = embedding_extractor_model(inputB)
+inputA = Input(config.IMAGE_SHAPE, name="inputA")
+inputB = Input(config.IMAGE_SHAPE, name="inputB")
 
-# distance = Lambda(euclidean_distance)([embeddedA, embeddedB])
-# output = Dense(1, activation="sigmoid")(distance)
-# siamese_face_model = Model(inputs=[inputA, inputB], outputs=output)
+embedding_extractor_model = embedding_extractor(config.IMAGE_SHAPE)
+embeddedA = embedding_extractor_model(inputA)
+embeddedB = embedding_extractor_model(inputB)
 
+distance = Lambda(euclidean_distance)([embeddedA, embeddedB])
+output = Dense(1, activation="sigmoid")(distance)
+siamese_face_model = Model(inputs=[inputA, inputB], outputs=output)
+
+print("[INFO] Compilling the siamese_face_model...")
+siamese_face_model.compile(
+                            loss = "binary_crossentropy",
+                            optimizer = "Adam",
+                            metrics = ["accuracy"]
+)
+
+print("[INFO] Training the siamese_face_model...")
+history = siamese_face_model.fit(train_dataset, validation_data=test_dataset,
+                                  batch_size=config.BATCH_SIZE, epochs=config.EPOCHS)
+
+print("[INFO] Saving siamese_face_model...")
+siamese_face_model.save(config.MODELS_PATH)
+
+print("[INFO] Saving plot....")
+ploting_learning_curves(history, config.PLOTS_PATH)
 
 
 

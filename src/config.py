@@ -4,7 +4,7 @@ IMAGE_SHAPE = (224, 224, 3)
 
 BATCH_SIZE = 64
 
-EPOCHS = 100
+EPOCHS = 10
 
 DATA_TRAIN_PATH = "..\\data\\classification\\train1000\\*\\*.*"
 

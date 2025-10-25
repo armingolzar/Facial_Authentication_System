@@ -19,7 +19,7 @@ def euclidean_distance(vectors):
     return tf.math.reduce_euclidean_norm(tensorA - tensorB, axis=1, keepdims=True)
 
 
-def learning_curves(history):
+def ploting_learning_curves(history, path):
 
     plt.figure(figsize=(8, 5))
     plt.plot(history.history["loss"], color="red", label="Training Loss")
@@ -29,5 +29,7 @@ def learning_curves(history):
     plt.title("Training & Validation Loss Curve")
     plt.legend()
     plt.grid(True)
-    plt.show() 
+    plt.savefig(path, dpi=300, bbox_inches='tight')
+    plt.show()
+    plt.close() 
 

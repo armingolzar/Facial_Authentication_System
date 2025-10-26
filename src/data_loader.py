@@ -62,10 +62,10 @@ def full_epoch_data_generator(addrs, cats, batch_size):
         
         indices = np.arange(len(addrs))
         np.random.shuffle(indices)
-        samples_batch_nedded = batch_size // 2
+        samples_batch_needded = batch_size // 2
 
-        for index in range(0, len(indices), samples_batch_nedded):
-            batch_indices = indices[index : index + samples_batch_nedded]
+        for index in range(0, len(indices), samples_batch_needded):
+            batch_indices = indices[index : index + samples_batch_needded]
             batch_samples, batch_pairs, batch_labels = [], [], []
 
 

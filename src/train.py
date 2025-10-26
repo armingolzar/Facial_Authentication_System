@@ -1,7 +1,7 @@
-from data_loader import get_image_path_and_categories, full_epoch_data_generator, preprocess_image, create_dataset
-from model import embedding_extractor
-from utils import euclidean_distance, ploting_learning_curves
-import config
+from src.data_loader import get_image_path_and_categories, full_epoch_data_generator, preprocess_image, create_dataset
+from src.model import embedding_extractor
+from src.utils import euclidean_distance, ploting_learning_curves, ContrastiveLoss
+import src.config as config
 from tensorflow.keras.layers import Dense, Input, Lambda
 from tensorflow.keras.models import Model
 
@@ -22,14 +22,15 @@ embeddedA = embedding_extractor_model(inputA)
 embeddedB = embedding_extractor_model(inputB)
 
 distance = Lambda(euclidean_distance)([embeddedA, embeddedB])
-output = Dense(1, activation="sigmoid")(distance)
-siamese_face_model = Model(inputs=[inputA, inputB], outputs=output)
+# output = Dense(1, activation="sigmoid")(distance)
+siamese_face_model = Model(inputs=[inputA, inputB], outputs=distance)
 
 print("[INFO] Compilling the siamese_face_model...")
 siamese_face_model.compile(
-                            loss = "binary_crossentropy",
-                            optimizer = "Adam",
-                            metrics = ["accuracy"]
+                            loss = ContrastiveLoss(margin=1.0),
+                            # loss = "binary_crossentropy",
+                            optimizer = "Adam"
+                            # metrics = ["accuracy"]
 )
 
 print("[INFO] Training the siamese_face_model...")

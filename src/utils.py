@@ -19,6 +19,33 @@ def euclidean_distance(vectors):
     return tf.math.reduce_euclidean_norm(tensorA - tensorB, axis=1, keepdims=True)
 
 
+
+class ContrastiveLoss(tf.keras.losses.Loss):
+
+    def __init__(self, margin=1.0, name="contrastive_loss", **kwargs):
+        super().__init__(name=name, **kwargs)
+        self.margin = margin
+
+    
+    def call(self, y_true, y_pred):
+        
+        y_true = tf.cast(y_true, tf.float32)
+        y_pred = tf.cast(y_pred, tf.float32)
+
+        squared_pred = tf.square(y_pred)
+        margin_term = tf.square(tf.maximum(self.margin - y_pred, 0.0))
+        cont_loss = tf.reduce_mean(y_true * squared_pred + (1 - y_true) * margin_term)
+
+        return cont_loss
+    
+
+    def get_config(self):
+        config = super().get_config()
+        config.update({"margin" : self.margin})
+        return config
+    
+
+
 def ploting_learning_curves(history, path):
 
     plt.figure(figsize=(8, 5))

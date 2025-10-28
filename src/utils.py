@@ -19,7 +19,6 @@ def euclidean_distance(vectors):
     return tf.math.reduce_euclidean_norm(tensorA - tensorB, axis=1, keepdims=True)
 
 
-
 class ContrastiveLoss(tf.keras.losses.Loss):
 
     def __init__(self, margin=1.0, name="contrastive_loss", **kwargs):

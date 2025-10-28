@@ -58,11 +58,9 @@ def generator(imgA_path, imgB_path, labels):
         yield(process_to_image(imgA), process_to_image(imgB), label)
 
 
-def face_authentication_system(data_path, mode="contrastive", threshold=0.5):
+def face_authentication_dataset(data_path):
 
-    y_true, y_pred = [], []
     data = pd.read_csv(data_path)
-    siamese_model = model_arch(mode)
     path_imageA = data.iloc[:,  0].values
     path_imageB = data.iloc[:,  1].values
     labels = data.iloc[:, -1].values
@@ -77,27 +75,53 @@ def face_authentication_system(data_path, mode="contrastive", threshold=0.5):
     )
     dataset = dataset.batch(config.BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
 
+    return dataset
+
+
+
+siamese_model = model_arch(mode="contrastive")
+
+for thresh in config.THRESHOLD:
+    print("thresh is :", thresh, "\n")
+    y_true, y_pred = [], []
+    dataset = face_authentication_dataset(config.CSV_TEST_PATH)
     for imgA_batch, imgB_batch, labels_batch in dataset:
         distance = siamese_model([imgA_batch, imgB_batch], training=False)
-        preds_batch = tf.cast(distance < config.THRESHOLD, tf.int32)
+        preds_batch = tf.cast(distance < thresh, tf.int32)
         y_pred.extend(preds_batch.numpy().flatten())
         y_true.extend(labels_batch.numpy())
 
+    accuracy = accuracy_score(y_true, y_pred)
+    cm = confusion_matrix(y_true, y_pred)
 
-    return y_true, y_pred
+    TN = cm[0, 0]
+    FP = cm[0, 1]
+    FN = cm[1, 0]
+    TP = cm[1, 1]
+
+    precision = TP / (TP + FP + 1e-8)
+    recall = TP / (TP + FN + 1e-8)
+
+    print("y_true[:20]:", y_true[:20])
+    print("y_pred[:20]:", y_pred[:20], "\n")
+
+    print("Accuracy:", accuracy)
+    print("Confusion Matrix:\n", cm)
+    print("\n")
+
+    print("Precision:", precision)
+    print("Recall:", recall)
+    print(f"End of {thresh} threshold", "\n")
 
 
-y_true, y_pred = face_authentication_system(config.CSV_TEST_PATH)
-
-print("y_true[:20]:", y_true[:20])
-print("y_pred[:20]:", y_pred[:20])
 
 
-accuracy = accuracy_score(y_true, y_pred)
-cm = confusion_matrix(y_true, y_pred)
 
-print("Accuracy:", accuracy)
-print("Confusion Matrix:\n", cm)
+
+
+
+
+
 
 
 

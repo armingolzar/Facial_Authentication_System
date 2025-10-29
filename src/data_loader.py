@@ -1,9 +1,6 @@
 import tensorflow as tf
-import glob
-import cv2 
+import glob 
 import numpy as np
-import os
-import pprint
 import random
 
 

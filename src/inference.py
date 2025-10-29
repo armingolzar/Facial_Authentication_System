@@ -81,18 +81,24 @@ def face_authentication_dataset(data_path):
 
 siamese_model = model_arch(mode="contrastive")
 
-for thresh in config.THRESHOLD:
-    print("thresh is :", thresh, "\n")
-    y_true, y_pred = [], []
-    dataset = face_authentication_dataset(config.CSV_TEST_PATH)
-    for imgA_batch, imgB_batch, labels_batch in dataset:
-        distance = siamese_model([imgA_batch, imgB_batch], training=False)
-        preds_batch = tf.cast(distance < thresh, tf.int32)
-        y_pred.extend(preds_batch.numpy().flatten())
-        y_true.extend(labels_batch.numpy())
 
-    accuracy = accuracy_score(y_true, y_pred)
-    cm = confusion_matrix(y_true, y_pred)
+y_true, y_pred = [], {}
+dataset = face_authentication_dataset(config.CSV_TEST_PATH)
+for imgA_batch, imgB_batch, labels_batch in dataset:
+    distance = siamese_model([imgA_batch, imgB_batch], training=False)
+    for thresh in config.THRESHOLD:
+        preds_batch = tf.cast(distance < thresh, tf.int32)
+        if thresh in y_pred:
+            y_pred[thresh].extend(preds_batch.numpy().flatten())
+        else:
+            y_pred[thresh] = list(preds_batch.numpy().flatten())
+        
+    y_true.extend(labels_batch.numpy())
+
+for T in y_pred:
+
+    accuracy = accuracy_score(y_true, y_pred[T])
+    cm = confusion_matrix(y_true, y_pred[T])
 
     TN = cm[0, 0]
     FP = cm[0, 1]
@@ -103,15 +109,14 @@ for thresh in config.THRESHOLD:
     recall = TP / (TP + FN + 1e-8)
 
     print("y_true[:20]:", y_true[:20])
-    print("y_pred[:20]:", y_pred[:20], "\n")
+    print("y_pred[:20]:", y_pred[T][:20], "\n")
 
     print("Accuracy:", accuracy)
     print("Confusion Matrix:\n", cm)
     print("\n")
 
     print("Precision:", precision)
-    print("Recall:", recall)
-    print(f"End of {thresh} threshold", "\n")
+    print("Recall:", recall, "\n")
 
 
 

@@ -33,7 +33,7 @@ Two training paradigms are implemented:
 
 **Confusion Matrix**
 
-[[54860 24740]
+[[54860 24740]<br>
 [17323 69877]]
 
 ### Interpretation:  
@@ -121,16 +121,15 @@ loss = ContrastiveLoss(margin=1.0)
 ### 2.Euclidean Distance Function
 A euclidean_distance function is defined to compute the distance between two embedding vectors. This is used within the contrastive learning framework to calculate similarity scores.
 ```
-    distance = euclidean_distance(embedding_a, embedding_b)
+distance = euclidean_distance(embedding_a, embedding_b)
 ```
 
 ### 3.Lambda Layer Integration
 The distance function is integrated into the model using a Lambda layer. This allows seamless end-to-end training within the Keras / TensorFlow model pipeline.
 ```
-    from tensorflow.keras.layers import Lambda
-
-    distance_layer = Lambda(euclidean_distance)([embedding_a, embedding_b])
-    model.add(distance_layer)
+from tensorflow.keras.layers import Lambda
+distance_layer = Lambda(euclidean_distance)([embedding_a, embedding_b])
+model.add(distance_layer)
 ```
 
 These custom components enable the model to learn embeddings effectively, which is useful for tasks such as similarity matching, metric learning, and contrastive representation learning.
@@ -157,15 +156,15 @@ for imgA_batch, imgB_batch, labels_batch in dataset:
 
 For the contrastive model, predictions are made by comparing distances to a threshold t:
 ```
-    y_pred = (distances < t).astype(int)
+y_pred = (distances < t).astype(int)
 ```
 
 A simple sweep finds the optimal threshold:
 
 ```
-    thresh_lst = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    for t in thresh_lst:
-        acc = accuracy_score(y_val, (distances < t))
+thresh_lst = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+for t in thresh_lst:
+    acc = accuracy_score(y_val, (distances < t))
 ```
 This ensures the best trade-off between precision and recall.
 
@@ -177,8 +176,17 @@ This ensures the best trade-off between precision and recall.
 
 Install dependencies:
 ```
-    pip install -r requirements.txt
+pip install -r requirements.txt
 ```
+
+## ▶️ How to Run the Project
+```
+# for training
+python -m src.train
+
+# for inference
+python -m src.inference
+``` 
 
 ## 🔬 Ways to Improve Accuracy
 
@@ -203,7 +211,7 @@ This project is primarily built as a training and demonstration project for:
 The structure reflects how real MLOps-oriented research and production prototypes are organized.
 
 ## 🧑‍💻 Author
-Armin Golzar
-AI Engineer | Deep Learning • Computer Vision 
-📍 GitHub: armingolzar
+Armin Golzar<br>
+AI Engineer | Deep Learning • Computer Vision<br>
+📍 GitHub: armingolzar<br>
 📧 Email: armingolzar78@gmail.com
